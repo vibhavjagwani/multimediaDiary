@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import Button from './Button'
-import Entry from './Entry'
+import Button from './Button';
+import Entry from './Entry';
 import axios from 'axios';
+import Login from './Login';
+
 
 
 class App extends Component {
@@ -27,9 +29,10 @@ class App extends Component {
 
   render() {
     return (
-    	<div className = "text-center" style ={{maxWidth: '1300px'}}>
+    	<div className = "text-center" style ={{maxWidth: '1350px'}}>
 	      <div className = "diary" style = {{display: this.state.newEntryDisplay}}>
 	       <h1> My diary </h1>
+	       <Login/>
 	       <div className ="rowButt row">
 	       	<Button name = "New entry" action={this.makeNewEntry} stile = {this.state.newEntryDisplay}></Button>
 	       	<Button name = "See old entries" onClick = {this.seeOldEntry} style = {{display: this.state.oldEntryDisplay}}></Button>

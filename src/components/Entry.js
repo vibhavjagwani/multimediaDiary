@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import Toolbar from './Toolbar'
+import Toolbar from './Toolbar';
+import Toolbarright from './Toolbarright';
 
 class Entry extends Component {
 
@@ -24,14 +25,17 @@ class Entry extends Component {
     return (
     	<div>
 	      <div className = "diary">
-	      	<div className = "entry">
+	      	<div>
+	      		<Toolbar id = "toolbar" className = "entry col-lg-2" />
+	      	</div>
+	      	<div className = "entry col-lg-8 col-lg-offset-2">
 	      		<h2 className = ""><span className = "badg" contentEditable ="true" name = "title"></span></h2>
 	      		<div>
 	      			<p><span className = "bad" contentEditable ="true" name = "post" onKeyPress = {this.matchYoutube}></span></p>
 	      		</div>
 	      	</div>
 	      	<div>
-	      	<Toolbar/>
+	      	<Toolbarright id = "toolbarRight" className = "entry col-lg-2"/>
 	      	</div>
 	      </div>
 	    </div>
