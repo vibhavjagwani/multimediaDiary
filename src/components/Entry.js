@@ -29,13 +29,13 @@ class Entry extends Component {
 	      		<Toolbar id = "toolbar" className = "entry col-lg-2" />
 	      	</div>
 	      	<div className = "entry col-lg-8 col-lg-offset-2">
-	      		<h2 className = ""><span className = "badg" contentEditable ="true" name = "title"></span></h2>
+	      		<h2 className = ""><span className = "badg" contentEditable ="true" name = "title" id = "postTitle"></span></h2>
 	      		<div>
-	      			<p><span className = "bad" contentEditable ="true" name = "post" onKeyPress = {this.matchYoutube}></span></p>
+	      			<p><span id = "postText" className = "bad" contentEditable ="true" name = "post" onKeyPress = {this.matchYoutube}></span></p>
 	      		</div>
 	      	</div>
 	      	<div>
-	      	<Toolbarright id = "toolbarRight" className = "entry col-lg-2"/>
+	      	<Toolbarright id = "toolbarRight" className = "entry col-lg-2" save ={this.props.route.save}/>
 	      	</div>
 	      </div>
 	    </div>

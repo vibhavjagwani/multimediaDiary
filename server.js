@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 var app = express();
 var router = express.Router();
 var Post = require('./model/posts');
+var User = require('./model/users');
 //set our port to either a predetermined port number if you have set 
 //it up, or 3001
 var port = process.env.API_PORT || 3001;
@@ -57,6 +58,32 @@ post.save(function(err) {
 res.send(err);
 res.json({ message: 'Post successfully added!' });
 	 });
+ });
+
+ router.route('/users')
+
+ .get(function(req,res) {
+ User.find(function(err,users){
+ 	if(err) {
+ 		res.send(err);
+ 	} else {
+ 		res.json(users);
+ 	}
+ });
+ })
+
+ .post(function(req,res) {
+ 	var user = new User();
+ 	user.user = req.body.user;
+ 	user.password = req.body.password;
+ 	user.save(function(err) {
+ 		if(err) {
+ 			res.send(err);
+ 		} else {
+ 			res.json({message: 'Thanks for siging up'
+ 			});
+ 		}
+ 	});
  });
 //Use our router configuration when we call /api
 //...

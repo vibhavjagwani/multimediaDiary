@@ -10,8 +10,11 @@
     "marked": "^0.3.6",
     "mongoose": "^4.13.5",
     "nodemon": "^1.12.1",
+    "re-base": "^3.2.0",
     "react": "^16.1.1",
     "react-dom": "^16.1.1",
+    "react-router": "^3.2.0",
+    "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.17",
     "webpack-dev-server": "^2.9.5"
   },
