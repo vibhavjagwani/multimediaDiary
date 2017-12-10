@@ -46,7 +46,6 @@ class Entry extends Component {
   render() {
     return (
     	<div>
-    	<Nav loggedIn = {this.state.loggedIn} />
 	      <div className = "diary">
 	      	<div>
 	      		<Toolbar id = "toolbar" className = "entry col-lg-2" />

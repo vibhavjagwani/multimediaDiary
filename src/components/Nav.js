@@ -28,11 +28,10 @@ class Nav extends Component {
   }
 
   render() {
-    console.log(this.state.loggedIn);
     return (
     	<div className = "row col-lg-13">
     	<nav>
-    <div className="nav-wrapper" style = {{backgroundColor:"white"}}>
+    <div className="nav-wrapper" style = {{backgroundColor:"white", float:"right", paddingRight: "60px"}}>
       		<ul id="nav-mobile" className="list-inline">
 	      	 	<Link to="/newEntry" className = "navbarList">Make Entry</Link>
 	        	<Link to="/entries" className = "navbarList">Your Entries</Link>

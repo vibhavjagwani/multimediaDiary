@@ -6,9 +6,22 @@ import Entries from './Entries';
 import Login from './Login';
 import { app, base } from '../base';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
+import { Redirect } from 'react-router-dom';
 import Nav from './Nav';
 import Logout from './Logout';
+import Specific from './Specific';
 
+
+function AuthenticatedRoute({component: Component, loggedIn, ...rest}) {
+	console.log(loggedIn);
+	return (
+		<Route {...rest} 
+		render = {(props) => loggedIn === true 
+			?<Component{...props} {...rest}/>
+			: <Redirect to= "/" /> }
+			/>
+		) 
+}
 
 class App extends Component {
 
@@ -18,10 +31,11 @@ class App extends Component {
 			newEntryDisplay: 'inline-block',
 			oldEntryDisplay: 'inline-block',
 			loggedIn: false,
-			entries:[]
+			entries:[],
+			currentUser:null
 		};
 		this.makeNewEntry = this.makeNewEntry.bind(this);
-		this.seeOldEntry = this.seeOldEntry.bind(this);
+		this.updateEntry = this.updateEntry.bind(this);
 		this.onSave = this.onSave.bind(this);
 	}
 
@@ -29,19 +43,22 @@ class App extends Component {
 		this.removeAuthListener = app.auth().onAuthStateChanged((user) => {
 			if(user) {
 				this.setState({
-					loggedIn: true
+					loggedIn: true,
+					currentUser: user
+				});
+				this.entriesRef = base.syncState('entries/' + user.uid, {
+					context: this,
+					state: 'entries'
 				});
 			} else {
 				this.setState({
-					loggedIn: false
+					loggedIn: false,
+					currentUser: null
 				});
+				base.removeBinding(this.entriesRef);
 			}
 		})
 
-		this.entriesRef = base.syncState('entries', {
-			context: this,
-			state: 'entries'
-		})
 	}
 
 	componentWillUnmount() {
@@ -58,26 +75,27 @@ class App extends Component {
 	}
 
 	onSave() {
-
     console.log('hello');
     console.log(document.getElementById('postTitle').innerHTML);
     console.log(document.getElementById('postText').innerHTML);
     var d = new Date();
     var theDate = (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear();
     const entries = {...this.state.entries}
-    const id = this.hashCode("" + Date.now()) //make better
+    const id = this.hashCode("" + this.state.currentUser.uid + Date.now()) //make better
     entries[id] = {
     	id: id,
     	title: document.getElementById('postTitle').innerHTML,
     	text: document.getElementById('postText').innerHTML,
-    	date: theDate
+    	date: theDate,
+    	time: d.getTime(),
+    	owner: this.state.currentUser.uid
     }
     this.setState({entries});
+    browserHistory.push('/entries');
   }
 
-	seeOldEntry() {
-
-
+	updateEntry() {
+		return this.state.entries;
 	}
 
   render() {
@@ -86,9 +104,10 @@ class App extends Component {
 	    	<Router history = {browserHistory}>
 	    		<div> Why is there nothing here</div>
 		    	<Route path = "/" component = {Login} url = 'http://localhost:3001/api/users' poll = {2000} loggedIn = {this.state.loggedIn}/>
-		    	<Route path = "/entries" component={Entries} thePosts = {this.state.entries} loggedIn = {this.state.loggedIn}/>
+		    	<AuthenticatedRoute path = "/entries" component={Entries} thePosts = {this.state.entries} loggedIn = {this.state.loggedIn}/>
 		    	<Route exact path = "/logout" component ={Logout}/>
-		    	<Route path = "/newEntry" component={Entry} save = {this.onSave} loggedIn = {this.state.loggedIn}/>
+		    	<Route path = "/newEntry" component={Entry} save = {this.onSave} loggedIn = {this.state.loggedIn} />
+		    	<Route path = "/specific/:entryId" component = {Specific} update = {this.updateEntry}/>
 		    	<Route path = "*"  component={NotFound}/>
 		    </Router>
 	    </div>

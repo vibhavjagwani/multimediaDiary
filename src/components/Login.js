@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect, browserHistory} from 'react-router';
-import { app,facebookProvider } from '../base';
+import { app,facebookProvider, googleProvider } from '../base';
 import Nav from './Nav';
 
 
@@ -17,7 +17,7 @@ const boxStyles = {
 	margin: "20px auto",
 	padding: "5px",
 	border: "1px solid black",
-	backgroundColor: "#b8c1d0",
+	backgroundColor: "#ffdf40",
 	borderRadius: "5px"
 }
 
@@ -58,7 +58,6 @@ class Login extends Component {
 			if(error) {
 				console.log('error: ' + error);
 			} else {
-				console.log('hello');
 				browserHistory.push('/entries');
 			}
 		})
@@ -66,6 +65,14 @@ class Login extends Component {
 
 	authWithGoogle() {
 		console.log('auth with google');
+		app.auth().signInWithPopup(googleProvider)
+		.then((result,error) => {
+			if(error) {
+				console.log('error: ' + error);
+			} else {
+				browserHistory.push('/entries');
+			}
+		})
 	}
 	handleLogin(e,props) {
 		e.preventDefault();
@@ -130,7 +137,7 @@ class Login extends Component {
   render() {
     return (
     	<div>
-    	<div className="diary" style = {{maxHeight: "605px"}}>
+    	<div className="diary" style = {{maxHeight: "665px"}}>
     		<div style = {boxStyles}>
     				<h1> Media diary </h1>
     				<div style = {styles}>
