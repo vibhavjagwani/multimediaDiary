@@ -4,8 +4,10 @@ import Entry from './Entry';
 import axios from 'axios';
 import Entries from './Entries';
 import Login from './Login';
-import { base } from '../base';
+import { app, base } from '../base';
 import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
+import Nav from './Nav';
+import Logout from './Logout';
 
 
 class App extends Component {
@@ -24,6 +26,18 @@ class App extends Component {
 	}
 
 	componentWillMount() {
+		this.removeAuthListener = app.auth().onAuthStateChanged((user) => {
+			if(user) {
+				this.setState({
+					loggedIn: true
+				});
+			} else {
+				this.setState({
+					loggedIn: false
+				});
+			}
+		})
+
 		this.entriesRef = base.syncState('entries', {
 			context: this,
 			state: 'entries'
@@ -31,6 +45,7 @@ class App extends Component {
 	}
 
 	componentWillUnmount() {
+		this.removeAuthListener();
 		base.removeBinding(this.entriesRef);
 	}
 
@@ -47,12 +62,15 @@ class App extends Component {
     console.log('hello');
     console.log(document.getElementById('postTitle').innerHTML);
     console.log(document.getElementById('postText').innerHTML);
+    var d = new Date();
+    var theDate = (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear();
     const entries = {...this.state.entries}
     const id = this.hashCode("" + Date.now()) //make better
     entries[id] = {
     	id: id,
     	title: document.getElementById('postTitle').innerHTML,
-    	text: document.getElementById('postText').innerHTML
+    	text: document.getElementById('postText').innerHTML,
+    	date: theDate
     }
     this.setState({entries});
   }
@@ -65,14 +83,14 @@ class App extends Component {
   render() {
     return (
     	<div className = "text-center" style ={{maxWidth: '1350px'}}>
-    	<div className = "diary">
 	    	<Router history = {browserHistory}>
+	    		<div> Why is there nothing here</div>
 		    	<Route path = "/" component = {Login} url = 'http://localhost:3001/api/users' poll = {2000} loggedIn = {this.state.loggedIn}/>
-		    	<Route path = "/entries" component={Entries} thePosts = {this.state.entries}/>
-		    	<Route path = "/newEntry" component={Entry} save = {this.onSave}/>
+		    	<Route path = "/entries" component={Entries} thePosts = {this.state.entries} loggedIn = {this.state.loggedIn}/>
+		    	<Route exact path = "/logout" component ={Logout}/>
+		    	<Route path = "/newEntry" component={Entry} save = {this.onSave} loggedIn = {this.state.loggedIn}/>
 		    	<Route path = "*"  component={NotFound}/>
 		    </Router>
-		</div>
 	    </div>
     );
   }

@@ -1,13 +1,35 @@
 import React, { Component } from 'react';
 import Toolbar from './Toolbar';
 import Toolbarright from './Toolbarright';
+import Nav from './Nav';
+import {browserHistory} from 'react-router';
+import {app} from '../base';
 
 class Entry extends Component {
 
 	constructor(props){
 		super(props);
+		this.state = {
+			loggedIn: false
+		}
 	}
-
+	componentWillMount() {
+  	this.removeAuthListener = app.auth().onAuthStateChanged((user) => {
+      if(user) {
+        this.setState({
+          loggedIn: true
+        });
+      } else {
+        this.setState({
+          loggedIn: false
+        });
+        browserHistory.push('/');
+      }
+    })
+  }
+  componentWillUnmount() {
+    this.removeAuthListener();
+  }
 	matchYoutube(e) {
 		var regyoutube = /(http(s)??\:\/\/)?(www\.)?((youtube\.com\/watch\?v=)|(youtu.be\/))([a-zA-Z0-9\-_])+$/;
 		if(e.key === ' ') {
@@ -24,6 +46,7 @@ class Entry extends Component {
   render() {
     return (
     	<div>
+    	<Nav loggedIn = {this.state.loggedIn} />
 	      <div className = "diary">
 	      	<div>
 	      		<Toolbar id = "toolbar" className = "entry col-lg-2" />

@@ -1,20 +1,40 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { browserHistory } from 'react-router';
+import { Redirect, browserHistory} from 'react-router';
+import { app,facebookProvider } from '../base';
+import Nav from './Nav';
+
+
+const styles = {
+	width: "80%",
+	maxWidth: "320px",
+	margin: "20px auto",
+	padding: "10px",
+}
+
+const boxStyles = {
+	maxWidth: "340px",
+	margin: "20px auto",
+	padding: "5px",
+	border: "1px solid black",
+	backgroundColor: "#b8c1d0",
+	borderRadius: "5px"
+}
 
 class Login extends Component {
 
 	constructor(props) {
 		super(props);
 		this.handleLogin = this.handleLogin.bind(this);
-		this.state = {data: [], auth: 'none', username:'', password:'', email:'', confirmPassword: ''};
+		this.state = {data: [], redir: false, username:'', password:'', email:'', confirmPassword: ''};
 		this.handleUsername = this.handleUsername.bind(this);
 		this.handlePassword = this.handlePassword.bind(this);
 		this.handleSignUp = this.handleSignUp.bind(this);
 		this.registerUsername = this.registerUsername.bind(this);
 		this.registerPassword = this.registerPassword.bind(this);
 		this.registerConfirmPassword = this.registerConfirmPassword.bind(this);
-		this.authWithEmail = this.authWithEmail.bind(this);
+		this.authWithFacebook = this.authWithFacebook.bind(this);
+		this.authWithGoogle = this.authWithGoogle.bind(this);
 	}
 	handleUsername(e) {
 		this.setState({username: e.target.value});
@@ -31,8 +51,21 @@ class Login extends Component {
 	registerConfirmPassword(e) {
 		this.setState({confirmPassword: e.target.value});
 	}
-	authWithEmail() {
-		console.log('auth with email');
+	authWithFacebook() {
+		console.log('auth with facebook');
+		app.auth().signInWithPopup(facebookProvider)
+		.then((result,error) => {
+			if(error) {
+				console.log('error: ' + error);
+			} else {
+				console.log('hello');
+				browserHistory.push('/entries');
+			}
+		})
+	}
+
+	authWithGoogle() {
+		console.log('auth with google');
 	}
 	handleLogin(e,props) {
 		e.preventDefault();
@@ -96,9 +129,29 @@ class Login extends Component {
 
   render() {
     return (
-    		<div className="container">
-    		    	 <h1> My diary </h1>
+    	<div>
+    	<div className="diary" style = {{maxHeight: "605px"}}>
+    		<div style = {boxStyles}>
+    				<h1> Media diary </h1>
+    				<div style = {styles}>
+	    		    	 <button style ={{width:"100%"}} className= "btn btn-primary" onClick = {() => {this.authWithFacebook()}}>
+	    		    	 	Log in with Facebook
+	    		    	 </button>
+	    		    	 <hr style = {{marginTop:"10px", marginBottom:"10px", borderColor: "black"}}/>
+	    		    	 <button style ={{width:"100%", marginBottom: "30px"}} className= "btn btn-success" onClick = {() => {this.authWithGoogle()}}>
+	    		    	 	Log in with Google
+	    		    	 </button>
+    		    	 </div>
+    		</div>
+    		<p> vjagwani - CIS 197 project </p>
+		</div>
+		</div>
+    );
+  }
+}
 
+const LoginOldVersion = (
+	<div>
     	<form onSubmit={(event) => {this.authWithEmail(event)}} ref={(form) => {this.loginForm = form}}>
     		<input type="email" onChange = {this.handleUsername} name="username" id="username" tabIndex="1" 
     		className="form-control" placeholder="Email" ref ={(input) => {this.emailInput = input}}/>
@@ -106,7 +159,7 @@ class Login extends Component {
     		className="form-control" placeholder="password" ref ={(input) => {this.passwordInput = input}}/>
     		<input type="submit" className ="btn-register" value = "Log In"/>
     	</form>
-    	<div className="row">
+	<div className="row">
 			<div className="col-md-6 col-md-offset-3">
 				<div className="panel panel-login" style = {{border:"1px solid black", padding: "15px"}}>
 					<div className="panel-heading">
@@ -162,9 +215,6 @@ class Login extends Component {
 				</div>
 			</div>
 		</div>
-		 </div>
-    );
-  }
-}
-
+		</div>
+)
 export default Login;
