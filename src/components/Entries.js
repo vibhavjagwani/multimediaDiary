@@ -12,6 +12,7 @@ class Entries extends Component {
 			entries:[],
 			loggedIn: false
 		}
+		this.sortTime = this.sortTime.bind(this);
 	}
 	componentWillMount() {
 		this.removeAuthListener = app.auth().onAuthStateChanged((user) => {
@@ -37,33 +38,52 @@ class Entries extends Component {
 		this.removeAuthListener();
 		base.removeBinding(this.entriesRef);
 	}
+
+	sortTime(a,b) {
+		return (this.state.entries[b]).time - (this.state.entries[a]).time
+	}
  
   render() {
   	const entryIds = Object.keys(this.state.entries);
+  	entryIds.sort(this.sortTime);
 	const entries = this.state.entries;
     return (
 	    <div>
 	    <Nav loggedIn = {this.state.loggedIn}/>
+	    <div>
+	    <h1> Posts</h1>
 	     {
 	     	entryIds.map((id) => {
-				console.log(entries[id].title);
+	     		if((entries[id].title).length > 13) {
+	     			var title = (entries[id].title).substring(0,13) + '...'
+	     		} else {
+	     			var title = entries[id].title
+	     		}
 				return(
-					<div key={id}>
-					<div className ="col-lg-8 col-lg-offset-3">
-					<Link to = {"/specific/" + entries[id].id}>
-						<div className = "col-lg-3"> 
-							<h1>{entries[id].date} </h1>
-						</div>
-						<div className = "col-lg-5">
-							<h1>{entries[id].title}</h1> 
-						</div>
-					</Link>
+					<div key={id} className = 'col-lg-3' style ={{}}>
+					<div className ='col-lg-10'>
+					<div className = 'col-lg-12' style={{borderRadius: '5px', padding: '30px', width:'100%',  backgroundColor: '#d5e4ff', marginTop: '40px', marginBottom: '10px'}}>
+							<Link to = {'/specific/' + entries[id].id}>
+							<div style = {{margin:'2px'}}> 
+								<h3 style ={{color:'black'}}>{entries[id].date} </h3>
+							</div>
+							<div>
+								<h4>{title}</h4> 
+							</div>
+							</Link>
+						<button className = 'btn btn-danger btn-block' onClick = {() => {
+							this.props.route.del(entries,id);
+							this.setState({entries: {[id]: null}});
+							this.forceUpdate();
+						}}>Delete</button>
+					</div>
 					</div>
 					</div>
 				)
 			})
 
 	     }
+	     </div>
 	    </div>
     );
   }

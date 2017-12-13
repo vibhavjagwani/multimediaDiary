@@ -29,19 +29,17 @@ class Nav extends Component {
 
   render() {
     return (
-    	<div className = "row col-lg-13">
-    	<nav>
-    <div className="nav-wrapper" style = {{backgroundColor:"white", float:"right", paddingRight: "60px"}}>
-      		<ul id="nav-mobile" className="list-inline">
-	      	 	<Link to="/newEntry" className = "navbarList">Make Entry</Link>
-	        	<Link to="/entries" className = "navbarList">Your Entries</Link>
-	        	<Link to="/trending" className = "navbarList">Trending</Link>
-	        	<Link to="/new" className = "navbarList">New</Link>
-            <Link to="/logout" className = "navbarList"> Logout </Link>
+  <div className = 'row col-lg-13' style = {{backgroundColor: 'white'}}>
+    <nav>
+      <div className='nav-wrapper ' style = {{backgroundColor:'none', float:'right', paddingRight: '50px'}}>
+      		<ul id='nav-mobile' className='list-inline'>
+	      	 	<Link to='/newEntry' className = 'navbarList'>Make Entry</Link>
+	        	<Link to='/entries' className = 'navbarList'>Your Entries</Link>
+            <Link to='/logout' className = 'navbarList'>Logout</Link>
 	        </ul>      		
 	    </div>
 	  </nav>
-		</div>
+	</div>
     );
   }
 }

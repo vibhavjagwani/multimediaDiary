@@ -5,6 +5,7 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
+var fs = require('fs');
 //and create our instances
 var app = express();
 var router = express.Router();
@@ -53,6 +54,8 @@ router.route('/posts')
  post.author = req.body.author;
  post.post = req.body.post;
  post.title = req.body.title;
+ post.time = req.body.time;
+ post.key = req.body.key;
 post.save(function(err) {
  if (err)
 res.send(err);
@@ -60,31 +63,6 @@ res.json({ message: 'Post successfully added!' });
 	 });
  });
 
- router.route('/users')
-
- .get(function(req,res) {
- User.find(function(err,users){
- 	if(err) {
- 		res.send(err);
- 	} else {
- 		res.json(users);
- 	}
- });
- })
-
- .post(function(req,res) {
- 	var user = new User();
- 	user.user = req.body.user;
- 	user.password = req.body.password;
- 	user.save(function(err) {
- 		if(err) {
- 			res.send(err);
- 		} else {
- 			res.json({message: 'Thanks for siging up'
- 			});
- 		}
- 	});
- });
 //Use our router configuration when we call /api
 //...
 app.use('/api', router);

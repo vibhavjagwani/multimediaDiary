@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import Button from './Button';
 import Entry from './Entry';
 import axios from 'axios';
 import Entries from './Entries';
 import Login from './Login';
 import { app, base } from '../base';
-import { Router, Route, Link, IndexRoute, hashHistory, browserHistory } from 'react-router';
+import { Router, Route, browserHistory } from 'react-router';
 import { Redirect } from 'react-router-dom';
-import Nav from './Nav';
 import Logout from './Logout';
 import Specific from './Specific';
 
@@ -18,7 +16,7 @@ function AuthenticatedRoute({component: Component, loggedIn, ...rest}) {
 		<Route {...rest} 
 		render = {(props) => loggedIn === true 
 			?<Component{...props} {...rest}/>
-			: <Redirect to= "/" /> }
+			: <Redirect to= '/' /> }
 			/>
 		) 
 }
@@ -37,6 +35,7 @@ class App extends Component {
 		this.makeNewEntry = this.makeNewEntry.bind(this);
 		this.updateEntry = this.updateEntry.bind(this);
 		this.onSave = this.onSave.bind(this);
+		this.onDelete = this.onDelete.bind(this);
 	}
 
 	componentWillMount() {
@@ -71,7 +70,7 @@ class App extends Component {
 	}
 
 	hashCode(s){
-  		return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);              
+  		return s.split('').reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);              
 	}
 
 	onSave() {
@@ -79,20 +78,39 @@ class App extends Component {
     console.log(document.getElementById('postTitle').innerHTML);
     console.log(document.getElementById('postText').innerHTML);
     var d = new Date();
-    var theDate = (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear();
+    var theDate = (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
     const entries = {...this.state.entries}
-    const id = this.hashCode("" + this.state.currentUser.uid + Date.now()) //make better
+    const id = this.hashCode('' + this.state.currentUser.uid + Date.now()) //make better
     entries[id] = {
     	id: id,
-    	title: document.getElementById('postTitle').innerHTML,
-    	text: document.getElementById('postText').innerHTML,
+    	title: document.getElementById('postTitle').innerHTML.replace(/&nbsp;/g,''),
+    	text: document.getElementById('postText').innerHTML.replace(/&nbsp;/g,''),
     	date: theDate,
     	time: d.getTime(),
-    	owner: this.state.currentUser.uid
+    	owner: this.state.currentUser.uid,
+    	background: document.getElementById('diary').style.backgroundImage
     }
     this.setState({entries});
     browserHistory.push('/entries');
-  }
+    //mongo
+		axios.post('http://localhost:3001/api/posts', {
+		author: this.state.currentUser.uid,
+		text:document.getElementById('postText').innerHTML.replace(/&nbsp;/g,''),
+		title: document.getElementById('postTitle').innerHTML.replace(/&nbsp;/g,''),
+		time: d.getTime(),
+		key: id 
+		})
+		.then(function(res) {
+		console.log('signed up');
+		})
+		.catch(function(err) {
+		console.log('sign up error' + err);
+		})	
+	}
+
+	onDelete(entries,id) {
+		this.setState({entries: {[id]: null}});
+	}
 
 	updateEntry() {
 		return this.state.entries;
@@ -100,15 +118,15 @@ class App extends Component {
 
   render() {
     return (
-    	<div className = "text-center" style ={{maxWidth: '1350px'}}>
+    	<div className = 'text-center' style ={{maxWidth: '1350px'}}>
 	    	<Router history = {browserHistory}>
 	    		<div> Why is there nothing here</div>
-		    	<Route path = "/" component = {Login} url = 'http://localhost:3001/api/users' poll = {2000} loggedIn = {this.state.loggedIn}/>
-		    	<AuthenticatedRoute path = "/entries" component={Entries} thePosts = {this.state.entries} loggedIn = {this.state.loggedIn}/>
-		    	<Route exact path = "/logout" component ={Logout}/>
-		    	<Route path = "/newEntry" component={Entry} save = {this.onSave} loggedIn = {this.state.loggedIn} />
-		    	<Route path = "/specific/:entryId" component = {Specific} update = {this.updateEntry}/>
-		    	<Route path = "*"  component={NotFound}/>
+		    	<Route path = '/' component = {Login} url = 'http://localhost:3001/api/users' loggedIn = {this.state.loggedIn}/>
+		    	<AuthenticatedRoute path = '/entries' component={Entries} thePosts = {this.state.entries} loggedIn = {this.state.loggedIn} del = {this.onDelete}/>
+		    	<Route exact path = '/logout' component={Logout} />
+		    	<Route path = '/newEntry' component={Entry} save = {this.onSave} loggedIn = {this.state.loggedIn} />
+		    	<Route path = '/specific/:entryId' component = {Specific} update = {this.updateEntry}/>
+		    	<Route path = '*'  component={NotFound}/>
 		    </Router>
 	    </div>
     );
@@ -116,27 +134,7 @@ class App extends Component {
 }
 
 const NotFound = () => (
-  <h1>404.. This page is not found!</h1>)
+  <h1>404... This page is not found!</h1>
+  )
 
-const Home = () => (
-	<div className = "text-center" style ={{maxWidth: '1350px'}}>
-	      <div className = "diary" style = {{display: this.state.newEntryDisplay}}>
-	       <h1> My diary </h1>
-	       <div>
-	       		<Link to = "/login"> Go to login</Link>
-	       </div>
-	       <Route exact path="/login" render= {() => <Login url = 'http://localhost:3001/api/posts' poll = {2000} loggedIn = {this.state.loggedIn}/>} />
-	       <div className ="rowButt row">
-	       	<Button name = "New entry" action={this.makeNewEntry} stile = {this.state.newEntryDisplay}></Button>
-	       	<Button name = "See old entries" onClick = {this.seeOldEntry} style = {{display: this.state.oldEntryDisplay}}></Button>
-	       </div>
-	      </div>
-	      <div className = "text-center">
-	      {
-	       		this.state.newEntryDisplay === 'none'?
-	       		<Entry save = {this.onSave} /> : <div></div>
-	       	}
-	      </div>
-	    </div>
-)
 export default App;

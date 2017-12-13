@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { app } from '../base';
-import { Redirect, browserHistory } from 'react-router';
+import { browserHistory } from 'react-router';
 
 class Logout extends Component {
 

@@ -8,5 +8,6 @@ var UsersSchema = new Schema({
  user: String,
  password: String //gotta do hash
 });
+
 //export our module to use in server.js
 module.exports = mongoose.model('Users', UsersSchema);
